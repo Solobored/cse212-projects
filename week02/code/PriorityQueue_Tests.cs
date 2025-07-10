@@ -8,8 +8,8 @@ public class PriorityQueueTests
     [TestMethod]
     // Scenario: Enqueue items with different priorities and dequeue them
     // Expected Result: Items should be dequeued in priority order (highest first)
-    // Defect(s) Found: 1) Loop in Dequeue goes to Count-1 instead of Count, missing last item
-    //                  2) Item is not actually removed from queue after finding highest priority
+    // Defect(s) Found: 1) Loop in Dequeue went to Count-1 instead of Count, missing last item
+    //                  2) Item was not actually removed from queue after finding highest priority
     public void TestPriorityQueue_1()
     {
         var priorityQueue = new PriorityQueue();
@@ -25,7 +25,7 @@ public class PriorityQueueTests
     [TestMethod]
     // Scenario: Enqueue items with same priority and verify FIFO order for same priority
     // Expected Result: Items with same priority should be dequeued in FIFO order
-    // Defect(s) Found: Same as above - loop condition and removal issues
+    // Defect(s) Found: The comparison for finding high priority was `>=` instead of `>`, causing it to pick the last item with highest priority instead of the first (FIFO).
     public void TestPriorityQueue_2()
     {
         var priorityQueue = new PriorityQueue();
@@ -41,7 +41,7 @@ public class PriorityQueueTests
     [TestMethod]
     // Scenario: Try to dequeue from empty queue
     // Expected Result: InvalidOperationException should be thrown
-    // Defect(s) Found: This should work correctly as implemented
+    // Defect(s) Found: None. This test passed as expected.
     public void TestPriorityQueue_Empty()
     {
         var priorityQueue = new PriorityQueue();
@@ -60,7 +60,7 @@ public class PriorityQueueTests
     [TestMethod]
     // Scenario: Mixed priorities with duplicates
     // Expected Result: Higher priorities first, then FIFO within same priority
-    // Defect(s) Found: Same loop and removal issues
+    // Defect(s) Found: The comparison for finding high priority was `>=` instead of `>`, causing incorrect FIFO behavior for items with same priority.
     public void TestPriorityQueue_MixedPriorities()
     {
         var priorityQueue = new PriorityQueue();

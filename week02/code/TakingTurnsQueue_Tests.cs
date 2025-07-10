@@ -11,7 +11,9 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3) and
     // run until the queue is empty
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: 1) PersonQueue.Enqueue adds to front instead of back (uses Insert(0) instead of Add())
+    //                  2) People with infinite turns (0 or less) are not being re-enqueued properly
+    //                  3) The queue order was reversed due to enqueue adding to front
     public void TestTakingTurnsQueue_FiniteRepetition()
     {
         var bob = new Person("Bob", 2);
@@ -43,7 +45,7 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (5), Sue (3)
     // After running 5 times, add George with 3 turns.  Run until the queue is empty.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, George, Sue, Tim, George, Tim, George
-    // Defect(s) Found: 
+    // Defect(s) Found: Same as above - PersonQueue.Enqueue adds to front instead of back, causing incorrect order
     public void TestTakingTurnsQueue_AddPlayerMidway()
     {
         var bob = new Person("Bob", 2);
@@ -76,7 +78,6 @@ public class TakingTurnsQueueTests
 
             var person = players.GetNextPerson();
             Assert.AreEqual(expectedResult[i].Name, person.Name);
-
             i++;
         }
     }
@@ -85,11 +86,11 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Bob (2), Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Bob, Tim, Sue, Bob, Tim, Sue, Tim, Sue, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: 1) TakingTurnsQueue.GetNextPerson doesn't handle infinite turns (0 or less) correctly
+    //                  2) PersonQueue.Enqueue adds to front instead of back
     public void TestTakingTurnsQueue_ForeverZero()
     {
         var timTurns = 0;
-
         var bob = new Person("Bob", 2);
         var tim = new Person("Tim", timTurns);
         var sue = new Person("Sue", 3);
@@ -116,7 +117,7 @@ public class TakingTurnsQueueTests
     // Scenario: Create a queue with the following people and turns: Tim (Forever), Sue (3)
     // Run 10 times.
     // Expected Result: Tim, Sue, Tim, Sue, Tim, Sue, Tim, Tim, Tim, Tim
-    // Defect(s) Found: 
+    // Defect(s) Found: Same as above - infinite turns (negative numbers) not handled correctly
     public void TestTakingTurnsQueue_ForeverNegative()
     {
         var timTurns = -3;
@@ -143,7 +144,7 @@ public class TakingTurnsQueueTests
     [TestMethod]
     // Scenario: Try to get the next person from an empty queue
     // Expected Result: Exception should be thrown with appropriate error message.
-    // Defect(s) Found: 
+    // Defect(s) Found: This test should pass - the exception handling appears to be implemented correctly
     public void TestTakingTurnsQueue_Empty()
     {
         var players = new TakingTurnsQueue();
