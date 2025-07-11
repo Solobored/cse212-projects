@@ -1,4 +1,8 @@
 using System.Text.Json;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 
 public static class SetsAndMaps
 {
@@ -6,14 +10,14 @@ public static class SetsAndMaps
     /// The words parameter contains a list of two character 
     /// words (lower case, no duplicates). Using sets, find an O(n) 
     /// solution for returning all symmetric pairs of words.  
-    ///
+    /// 
     /// For example, if words was: [am, at, ma, if, fi], we would return :
-    ///
+    /// 
     /// ["am & ma", "if & fi"]
-    ///
+    /// 
     /// The order of the array does not matter, nor does the order of the specific words in each string in the array.
     /// at would not be returned because ta is not in the list of words.
-    ///
+    /// 
     /// As a special case, if the letters are the same (example: 'aa') then
     /// it would not match anything else (remember the assumption above
     /// that there were no duplicates) and therefore should not be returned.
@@ -22,7 +26,31 @@ public static class SetsAndMaps
     public static string[] FindPairs(string[] words)
     {
         // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        HashSet<string> wordSet = new HashSet<string>(words);
+        List<string> result = new List<string>();
+
+        foreach (string word in words)
+        {
+            // Skip words with identical characters (e.g., "aa") as they cannot form symmetric pairs
+            if (word[0] == word[1])
+            {
+                continue;
+            }
+
+            // Reverse the word to find its symmetric pair
+            char[] charArray = word.ToCharArray();
+            System.Array.Reverse(charArray);
+            string reversedWord = new string(charArray);
+
+            // Check if the reversed word exists in the set
+            // And ensure we haven't already added this pair (e.g., if "ma" was processed first, "am" would be found)
+            if (wordSet.Contains(reversedWord) && !result.Contains($"{reversedWord} & {word}"))
+            {
+                result.Add($"{word} & {reversedWord}");
+            }
+        }
+
+        return result.ToArray();
     }
 
     /// <summary>
@@ -43,8 +71,18 @@ public static class SetsAndMaps
         {
             var fields = line.Split(",");
             // TODO Problem 2 - ADD YOUR CODE HERE
-        }
+            // The degree information is in the 4th column (index 3)
+            string degree = fields[3].Trim(); // Trim any leading/trailing whitespace
 
+            if (degrees.ContainsKey(degree))
+            {
+                degrees[degree]++;
+            }
+            else
+            {
+                degrees[degree] = 1;
+            }
+        }
         return degrees;
     }
 
@@ -67,7 +105,55 @@ public static class SetsAndMaps
     public static bool IsAnagram(string word1, string word2)
     {
         // TODO Problem 3 - ADD YOUR CODE HERE
-        return false;
+        // Helper to normalize words (remove spaces, convert to lowercase)
+        string normalizedWord1 = word1.Replace(" ", "").ToLower();
+        string normalizedWord2 = word2.Replace(" ", "").ToLower();
+
+        // If lengths are different after normalization, they cannot be anagrams
+        if (normalizedWord1.Length != normalizedWord2.Length)
+        {
+            return false;
+        }
+
+        Dictionary<char, int> charCounts = new Dictionary<char, int>();
+
+        // Count characters in normalizedWord1
+        foreach (char c in normalizedWord1)
+        {
+            if (charCounts.ContainsKey(c))
+            {
+                charCounts[c]++;
+            }
+            else
+            {
+                charCounts[c] = 1;
+            }
+        }
+
+        // Decrement counts for characters in normalizedWord2
+        foreach (char c in normalizedWord2)
+        {
+            if (charCounts.ContainsKey(c))
+            {
+                charCounts[c]--;
+            }
+            else
+            {
+                // Character in word2 not found in word1, so not an anagram
+                return false;
+            }
+        }
+
+        // Check if all character counts are zero
+        foreach (int count in charCounts.Values)
+        {
+            if (count != 0)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -79,7 +165,7 @@ public static class SetsAndMaps
     /// the built-in HTTP client library, this function will return a list of all
     /// earthquake locations ('place' attribute) and magnitudes ('mag' attribute).
     /// Additional information about the format of the JSON data can be found 
-    /// at this website:  
+    /// at this website:   
     /// 
     /// https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
     /// 
@@ -93,14 +179,25 @@ public static class SetsAndMaps
         using var reader = new StreamReader(jsonStream);
         var json = reader.ReadToEnd();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-
         var featureCollection = JsonSerializer.Deserialize<FeatureCollection>(json, options);
-
+        
         // TODO Problem 5:
         // 1. Add code in FeatureCollection.cs to describe the JSON using classes and properties 
         // on those classes so that the call to Deserialize above works properly.
         // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
         // 3. Return an array of these string descriptions.
-        return [];
+
+        List<string> summaries = new List<string>();
+        if (featureCollection?.Features != null)
+        {
+            foreach (var feature in featureCollection.Features)
+            {
+                if (feature.Properties != null)
+                {
+                    summaries.Add($"{feature.Properties.Place} - Mag {feature.Properties.Mag}");
+                }
+            }
+        }
+        return summaries.ToArray();
     }
 }

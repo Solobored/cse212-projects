@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+
 /// <summary>
 /// Defines a maze using a dictionary. The dictionary is provided by the
 /// user when the Maze object is created. The dictionary will contain the
@@ -25,14 +28,39 @@ public class Maze
         _mazeMap = mazeMap;
     }
 
-    // TODO Problem 4 - ADD YOUR CODE HERE
     /// <summary>
     /// Check to see if you can move left.  If you can, then move.  If you
     /// can't move, throw an InvalidOperationException with the message "Can't go that way!".
     /// </summary>
     public void MoveLeft()
     {
-        // FILL IN CODE
+        if (_mazeMap.TryGetValue((_currX, _currY), out bool[] movements))
+        {
+            if (movements[0]) // Index 0 is 'left'
+            {
+                int nextX = _currX - 1;
+                // Check if the destination is within the maze boundaries
+                if (_mazeMap.ContainsKey((nextX, _currY)))
+                {
+                    _currX = nextX;
+                }
+                else
+                {
+                    // Moving left is allowed from current cell, but destination is out of bounds
+                    throw new InvalidOperationException("Can't go that way!");
+                }
+            }
+            else
+            {
+                // Wall in the left direction from current cell
+                throw new InvalidOperationException("Can't go that way!");
+            }
+        }
+        else
+        {
+            // Current location not found in map, treat as a wall
+            throw new InvalidOperationException("Can't go that way!");
+        }
     }
 
     /// <summary>
@@ -41,7 +69,33 @@ public class Maze
     /// </summary>
     public void MoveRight()
     {
-        // FILL IN CODE
+        if (_mazeMap.TryGetValue((_currX, _currY), out bool[] movements))
+        {
+            if (movements[1]) // Index 1 is 'right'
+            {
+                int nextX = _currX + 1;
+                // Check if the destination is within the maze boundaries
+                if (_mazeMap.ContainsKey((nextX, _currY)))
+                {
+                    _currX = nextX;
+                }
+                else
+                {
+                    // Moving right is allowed from current cell, but destination is out of bounds
+                    throw new InvalidOperationException("Can't go that way!");
+                }
+            }
+            else
+            {
+                // Wall in the right direction from current cell
+                throw new InvalidOperationException("Can't go that way!");
+            }
+        }
+        else
+        {
+            // Current location not found in map, treat as a wall
+            throw new InvalidOperationException("Can't go that way!");
+        }
     }
 
     /// <summary>
@@ -50,7 +104,33 @@ public class Maze
     /// </summary>
     public void MoveUp()
     {
-        // FILL IN CODE
+        if (_mazeMap.TryGetValue((_currX, _currY), out bool[] movements))
+        {
+            if (movements[2]) // Index 2 is 'up'
+            {
+                int nextY = _currY - 1; // Fixed: up decreases y
+                // Check if the destination is within the maze boundaries
+                if (_mazeMap.ContainsKey((_currX, nextY)))
+                {
+                    _currY = nextY;
+                }
+                else
+                {
+                    // Moving up is allowed from current cell, but destination is out of bounds
+                    throw new InvalidOperationException("Can't go that way!");
+                }
+            }
+            else
+            {
+                // Wall in the up direction from current cell
+                throw new InvalidOperationException("Can't go that way!");
+            }
+        }
+        else
+        {
+            // Current location not found in map, treat as a wall
+            throw new InvalidOperationException("Can't go that way!");
+        }
     }
 
     /// <summary>
@@ -59,7 +139,33 @@ public class Maze
     /// </summary>
     public void MoveDown()
     {
-        // FILL IN CODE
+        if (_mazeMap.TryGetValue((_currX, _currY), out bool[] movements))
+        {
+            if (movements[3]) // Index 3 is 'down'
+            {
+                int nextY = _currY + 1; // Fixed: down increases y
+                // Check if the destination is within the maze boundaries
+                if (_mazeMap.ContainsKey((_currX, nextY)))
+                {
+                    _currY = nextY;
+                }
+                else
+                {
+                    // Moving down is allowed from current cell, but destination is out of bounds
+                    throw new InvalidOperationException("Can't go that way!");
+                }
+            }
+            else
+            {
+                // Wall in the down direction from current cell
+                throw new InvalidOperationException("Can't go that way!");
+            }
+        }
+        else
+        {
+            // Current location not found in map, treat as a wall
+            throw new InvalidOperationException("Can't go that way!");
+        }
     }
 
     public string GetStatus()
