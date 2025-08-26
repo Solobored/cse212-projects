@@ -32,7 +32,6 @@ public class LinkedList : IEnumerable<int>
     /// </summary>
     public void InsertTail(int value)
     {
-        // Create new node
         Node newNode = new(value);
         // If the list is empty, then point both head and tail to the new node.
         if (_tail is null)
